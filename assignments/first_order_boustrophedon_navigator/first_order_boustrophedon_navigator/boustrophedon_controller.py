@@ -66,9 +66,9 @@ class BoustrophedonController(Node):
         super().__init__('lawnmower_controller')
 
         # Declare parameters with dict type
-        # use 
+        # WARN: should sync with boustrophedon.launch.py
         self.default_gains = {
-            'Kp_linear': 4.0,
+            'Kp_linear': 4,
             'Kd_linear': 0.3,
             'Kp_angular': 6.5,
             'Kd_angular': 0.05
@@ -128,7 +128,7 @@ class BoustrophedonController(Node):
         self.prev_time = self.get_clock().now()
 
         # Waypoints
-        self.spacing = 1.0
+        self.spacing = 0.4
         self.waypoints = self.generate_waypoints()
         self.current_waypoint = 0
 

@@ -10,7 +10,7 @@ from launch_ros.parameter_descriptions import ParameterValue
 def generate_launch_description():
     controller_gains_arg = DeclareLaunchArgument(
         'controller_gains',
-        default_value='{"Kp_linear": 10.0, "Kd_linear": 0.1, "Kp_angular": 5.0, "Kd_angular": 0.2}',
+        default_value='{"Kp_linear": 4, "Kd_linear": 0.3, "Kp_angular": 6.5, "Kd_angular": 0.05}',
         description='Controller gains for the boustrophedon controller'
     )
 
