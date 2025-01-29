@@ -128,7 +128,7 @@ class BoustrophedonController(Node):
         self.prev_time = self.get_clock().now()
 
         # Waypoints
-        self.spacing = 0.4
+        self.spacing = 1.0
         self.waypoints = self.generate_waypoints()
         self.current_waypoint = 0
 
