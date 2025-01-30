@@ -1,34 +1,67 @@
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, ExecuteProcess
+from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+from launch.substitutions import PathJoinSubstitution
+from ament_index_python.packages import get_package_share_directory
 import os
 
+
 def generate_launch_description():
+
+    # path related
     pkg_cart_pole = FindPackageShare('cart_pole_optimal_control')
-    
-    # Paths to resources
     model_path = PathJoinSubstitution([pkg_cart_pole, 'models'])
     sdf_path = PathJoinSubstitution([model_path, 'cart_pole', 'model.sdf'])
+
+    '''
+    Use local gz(e.g., gz-gardan)
     
-    # Start Gazebo
-    gazebo = ExecuteProcess(
-        cmd=['gz', 'sim', '-r', 'empty.sdf'],
-        output='screen'
+    WARNING: Might be Not COMPATIBLE with ros-gz-sim
+    '''
+    # gazebo = ExecuteProcess(
+    #     cmd=['gz', 'sim', 'r', 'empty.sdf'],
+    #     output='screen'
+    # )
+
+    '''
+    Use ROS2 default gz (gz-fortress for ROS2 humble)
+    
+    REQUIRED: 
+    sudo apt-get install \
+        ros-humble-ros-gz-bridge \
+        ros-humble-ros-gz-sim \
+        ros-humble-ros-gz-interfaces
+    '''
+
+    # set gz_sim.launch.py path
+    ros_gz_sim_share = get_package_share_directory('ros_gz_sim')
+    gz_sim_launch = os.path.join(
+        ros_gz_sim_share, 'launch', 'gz_sim.launch.py')
+
+    # cmd format: ros2 launch ros_gz_sim gz_sim.launch.py gz_args:="-r empty.sdf"
+    gazebo = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(gz_sim_launch),
+        launch_arguments={
+            # 'gz_version': '7',      # if you want to use gz garden(but there's a bug)
+            'gz_args': '-r empty.sdf',
+        }.items(),
     )
-    
-    # Spawn the cart pole
+
     spawn_entity = Node(
         package='ros_gz_sim',
         executable='create',
-        arguments=['-name', 'cart_pole',
-                  '-file', sdf_path],
-        output='screen'
+        arguments=[
+            '-world', 'empty',    # explicit world name to avoid error
+            '-name', 'cart_pole',
+            '-file', sdf_path,
+        ],
+        output='screen',
+        emulate_tty=True,
     )
-    
-    # Start the LQR controller
+
     cart_pole_controller = Node(
         package='cart_pole_optimal_control',
         executable='cart_pole_lqr',
@@ -42,31 +75,31 @@ def generate_launch_description():
             'Q_x': 1.0,
             'Q_theta': 10.0,
             'R': 1.0,
-        }]
+        }],
+        emulate_tty=True
     )
-    
-    # Bridge to convert Gazebo topics to ROS topics
+
+    # bridges
     bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
         arguments=[
-            # Clock bridge
             '/world/empty/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
-            # Joint state bridge
-            '/world/empty/model/cart_pole/joint_state@sensor_msgs/msg/JointState[gz.msgs.Model',
-            # Command bridge for cart only
+            '/model/cart_pole/joint_state@sensor_msgs/msg/JointState[gz.msgs.Model',
             '/model/cart_pole/joint/cart_slider/cmd_vel@std_msgs/msg/Float64]gz.msgs.Double'
         ],
         remappings=[
-            ('/world/empty/model/cart_pole/joint_state', '/cart_pole/joint_states'),
-            ('/model/cart_pole/joint/cart_slider/cmd_vel', '/cart_pole/cart_slider_cmd'),
+            ('/model/cart_pole/joint_state', '/cart_pole/joint_states'),
+            ('/model/cart_pole/joint/cart_slider/cmd_vel',
+             '/cart_pole/cart_slider_cmd'),
         ],
-        output='screen'
+        output='screen',
+        emulate_tty=True
     )
-    
+
     return LaunchDescription([
         gazebo,
         spawn_entity,
         cart_pole_controller,
         bridge
-    ]) 
+    ])
