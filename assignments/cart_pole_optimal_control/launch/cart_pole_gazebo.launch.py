@@ -1,5 +1,5 @@
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
@@ -85,11 +85,11 @@ def generate_launch_description():
         executable='parameter_bridge',
         arguments=[
             '/world/empty/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
-            '/model/cart_pole/joint_state@sensor_msgs/msg/JointState[gz.msgs.Model',
+            '/world/empty/model/cart_pole/joint_state@sensor_msgs/msg/JointState[gz.msgs.Model',
             '/model/cart_pole/joint/cart_slider/cmd_vel@std_msgs/msg/Float64]gz.msgs.Double'
         ],
         remappings=[
-            ('/model/cart_pole/joint_state', '/cart_pole/joint_states'),
+            ('/world/empty/model/cart_pole/joint_state', '/cart_pole/joint_states'),
             ('/model/cart_pole/joint/cart_slider/cmd_vel',
              '/cart_pole/cart_slider_cmd'),
         ],
@@ -97,9 +97,29 @@ def generate_launch_description():
         emulate_tty=True
     )
 
+    # add timer action
+    SPAWN_DELAY = 3.0
+    CONTROLLER_DELAY = 5.0
+    BRIDGE_DELAY = 7.0
+    
+    delayed_spawn_entity = TimerAction(
+        period=SPAWN_DELAY, 
+        actions=[spawn_entity]
+    )
+    
+    delayed_cart_pole_controller = TimerAction(
+        period=CONTROLLER_DELAY, 
+        actions=[cart_pole_controller]
+    )
+    
+    delayed_bridge = TimerAction(
+        period=BRIDGE_DELAY, 
+        actions=[bridge]
+    )
+
     return LaunchDescription([
         gazebo,
-        spawn_entity,
-        cart_pole_controller,
-        bridge
+        delayed_spawn_entity,
+        delayed_cart_pole_controller,
+        delayed_bridge
     ])
