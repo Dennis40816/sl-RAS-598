@@ -5,6 +5,10 @@
 
 This ROS 2 package implements an LQR (Linear Quadratic Regulator) controller for balancing an inverted pendulum on a cart. The system demonstrates optimal control of an underactuated system, where we control only the cart's position to stabilize both the cart position and pole angle.
 
+## Note
+
+- [Hackmd](https://hackmd.io/@dennis40816/HJcpJjddyl)
+
 ## System Description
 
 The cart-pole system consists of:
@@ -405,3 +409,5 @@ Where the linearized system matrix \(\mathbf{A}_{lin}\) and input matrix \(\math
 
 - [Using Python Virtual Environments](https://github.com/ros2/ros2/issues/1094)
 - Currently, there's a bug when using virtualenv with `--symlink-install`
+
+## Appendix 
