@@ -41,9 +41,9 @@ def generate_launch_description():
             'mass_pole': 0.1,
             'pole_length': 1.0,
             'gravity': 9.81,
-            'Q_x': 1.0,
-            'Q_theta': 10.0,
-            'R': 1.0,
+            # 'Q_x': 3.0,
+            # 'Q_theta': 10.0,
+            # 'R': 1.0,
         }],
         emulate_tty=True,
     )

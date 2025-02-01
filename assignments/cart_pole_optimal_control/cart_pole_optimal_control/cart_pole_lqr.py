@@ -4,10 +4,10 @@ import rclpy
 from rclpy.node import Node
 import numpy as np
 import control
-from std_msgs.msg import Float64
+from std_msgs.msg import Float64, Float64MultiArray
 from sensor_msgs.msg import JointState
-from rcl_interfaces.msg import Parameter, ParameterDescriptor, FloatingPointRange
-from rclpy.parameter import ParameterType
+
+from time import sleep
 
 class CartPoleLQR(Node):
     def __init__(self):
@@ -20,11 +20,17 @@ class CartPoleLQR(Node):
         self.declare_parameter('gravity', 9.81)
         
         # LQR weights
-        self.declare_parameter('Q_x', 1.0)
-        self.declare_parameter('Q_x_dot', 0.1)
-        self.declare_parameter('Q_theta', 10.0)
-        self.declare_parameter('Q_theta_dot', 0.1)
-        self.declare_parameter('R', 1.0)
+        # self.declare_parameter('Q_x', 1.0)
+        # self.declare_parameter('Q_x_dot', 0.1)
+        # self.declare_parameter('Q_theta', 10.0)
+        # self.declare_parameter('Q_theta_dot', 0.1)
+        # self.declare_parameter('R', 1.0)
+        
+        self.declare_parameter('Q_x', 100.0)
+        self.declare_parameter('Q_x_dot', 1.0)
+        self.declare_parameter('Q_theta', 120.0)
+        self.declare_parameter('Q_theta_dot', 5.0)
+        self.declare_parameter('R', 0.8)
 
         # Get initial parameters
         self.update_parameters()
@@ -35,6 +41,9 @@ class CartPoleLQR(Node):
         
         # Setup publishers for control commands
         self.cart_cmd_pub = self.create_publisher(Float64, '/cart_pole/cart_slider_cmd', 10)
+        
+        # Setup contribute publisher
+        self.contrib_pub = self.create_publisher(Float64MultiArray, '/contributions', 10)
         
         # Subscribe to joint states
         self.joint_state_sub = self.create_subscription(
@@ -65,6 +74,11 @@ class CartPoleLQR(Node):
             self.get_parameter('Q_theta').value,
             self.get_parameter('Q_theta_dot').value
         ])
+        
+        # log parameters
+        self.get_logger().info(f'\n{self.Q}')
+        sleep(3.0)
+        
         self.R = np.array([[self.get_parameter('R').value]])
 
     def compute_lqr_gains(self):
@@ -110,9 +124,27 @@ class CartPoleLQR(Node):
         
         # Publish control command
         cmd_msg = Float64()
-        cmd_msg.data = float(u[0])
-        self.get_logger().warn(f'{u[0]}')
+        
+        # FIXME: u[0] is force instead?
+        # ignore friction force
+        _a = u[0] / (self.M + self.m)
+        new_vel = self.state[1] + _a * 0.02 # 50Hz
+        delta_vel = _a * 0.02
+        cmd_msg.data = float(new_vel)
+        
+        # publish vel_cmd
         self.cart_cmd_pub.publish(cmd_msg)
+        self.get_logger().warn(f'{new_vel}')
+        
+        # publish contribute
+        contrib_x      = -self.K[0, 0] * self.state[0]
+        contrib_x_dot  = -self.K[0, 1] * self.state[1]
+        contrib_theta  = -self.K[0, 2] * self.state[2]
+        contrib_theta_dot = -self.K[0, 3] * self.state[3]
+        
+        contrib_msg = Float64MultiArray()
+        contrib_msg.data = [contrib_x, contrib_x_dot, contrib_theta, contrib_theta_dot, delta_vel]
+        self.contrib_pub.publish(contrib_msg)
 
     def parameter_callback(self, params):
         for param in params:
