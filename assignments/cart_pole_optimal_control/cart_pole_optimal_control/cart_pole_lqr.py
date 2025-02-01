@@ -127,6 +127,8 @@ class CartPoleLQR(Node):
         
         # FIXME: u[0] is force instead?
         # ignore friction force
+        
+        # TODO: force limitation?
         _a = u[0] / (self.M + self.m)
         new_vel = self.state[1] + _a * 0.02 # 50Hz
         delta_vel = _a * 0.02
@@ -162,3 +164,8 @@ def main(args=None):
 
 if __name__ == '__main__':
     main() 
+    
+    
+# Discussion
+# input max mechanism
+# there's friction
