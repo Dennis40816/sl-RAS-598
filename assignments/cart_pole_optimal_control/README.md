@@ -23,7 +23,11 @@ The cart-pole system consists of:
   ```
 - Python Control Systems Library:
   ```bash
-  sudo apt-get install python3-control
+  # not found?
+  # sudo apt-get install python3-control
+
+  # global install in Ubuntu 24.04
+  # pip install control --break-system-packages
   ```
 
 ## Installation
@@ -162,4 +166,9 @@ Feel free to submit issues and pull requests for improvements.
 
 ## License
 
-This work is licensed under a [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/). 
+This work is licensed under a [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/).
+
+---
+
+## Write Up
+- [LQR Controller Note](https://hackmd.io/HtVHpZo1SHScS-VC-HQmMg)
