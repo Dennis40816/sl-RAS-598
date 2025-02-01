@@ -111,6 +111,7 @@ class CartPoleLQR(Node):
         # Publish control command
         cmd_msg = Float64()
         cmd_msg.data = float(u[0])
+        self.get_logger().warn(f'{u[0]}')
         self.cart_cmd_pub.publish(cmd_msg)
 
     def parameter_callback(self, params):

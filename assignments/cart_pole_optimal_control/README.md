@@ -45,6 +45,8 @@ The cart-pole system consists of:
    source install/setup.bash
    ```
 
+**check is there other package build with current package -> might cause bug**
+
 ## Usage
 
 Launch the simulation with:
