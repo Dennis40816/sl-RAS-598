@@ -16,7 +16,8 @@ def generate_launch_description():
     # Start Gazebo
     gazebo = ExecuteProcess(
         cmd=['gz', 'sim', '-r', 'empty.sdf'],
-        output='screen'
+        output='screen',
+        emulate_tty=True,
     )
     
     # Spawn the cart pole
@@ -25,7 +26,8 @@ def generate_launch_description():
         executable='create',
         arguments=['-name', 'cart_pole',
                   '-file', sdf_path],
-        output='screen'
+        output='screen',
+        emulate_tty=True,
     )
     
     # Start the LQR controller
@@ -42,7 +44,8 @@ def generate_launch_description():
             'Q_x': 1.0,
             'Q_theta': 10.0,
             'R': 1.0,
-        }]
+        }],
+        emulate_tty=True,
     )
     
     # Bridge to convert Gazebo topics to ROS topics
@@ -61,7 +64,8 @@ def generate_launch_description():
             ('/world/empty/model/cart_pole/joint_state', '/cart_pole/joint_states'),
             ('/model/cart_pole/joint/cart_slider/cmd_vel', '/cart_pole/cart_slider_cmd'),
         ],
-        output='screen'
+        output='screen',
+        emulate_tty=True,
     )
     
     return LaunchDescription([
