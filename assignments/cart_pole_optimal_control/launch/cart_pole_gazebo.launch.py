@@ -85,11 +85,13 @@ def generate_launch_description():
         executable='parameter_bridge',
         arguments=[
             '/world/empty/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
-            '/world/empty/model/cart_pole/joint_state@sensor_msgs/msg/JointState[gz.msgs.Model',
+            # check there's no /world/default -> conflict
+            '/world/empty/model/cart_pole/joint_state@sensor_msgs/msg/JointState[   gz.msgs.Model',
             '/model/cart_pole/joint/cart_slider/cmd_vel@std_msgs/msg/Float64]gz.msgs.Double'
         ],
+        # remap `ros2` topic(not gazebo topic to ros2)
         remappings=[
-            ('/world/empty/model/cart_pole/joint_state', '/cart_pole/joint_states'),
+            ('/model/cart_pole/joint_state', '/cart_pole/joint_states'),
             ('/model/cart_pole/joint/cart_slider/cmd_vel',
              '/cart_pole/cart_slider_cmd'),
         ],
@@ -100,7 +102,7 @@ def generate_launch_description():
     # add timer action
     SPAWN_DELAY = 3.0
     CONTROLLER_DELAY = 5.0
-    BRIDGE_DELAY = 7.0
+    BRIDGE_DELAY = 5.0
     
     delayed_spawn_entity = TimerAction(
         period=SPAWN_DELAY, 

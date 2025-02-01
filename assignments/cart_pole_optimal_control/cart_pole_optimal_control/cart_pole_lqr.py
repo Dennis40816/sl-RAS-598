@@ -112,6 +112,9 @@ class CartPoleLQR(Node):
         cmd_msg = Float64()
         cmd_msg.data = float(u[0])
         self.cart_cmd_pub.publish(cmd_msg)
+        
+        # debug usage
+        self.get_logger().info(f'{u[0]}')
 
     def parameter_callback(self, params):
         for param in params:

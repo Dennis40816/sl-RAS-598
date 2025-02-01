@@ -410,4 +410,8 @@ Where the linearized system matrix \(\mathbf{A}_{lin}\) and input matrix \(\math
 - [Using Python Virtual Environments](https://github.com/ros2/ros2/issues/1094)
 - Currently, there's a bug when using virtualenv with `--symlink-install`
 
-## Appendix 
+## Appendix 3: humble 的 gazebo 行為
+
+- 當執行 ros_gz_sim 的版本 < 7(預設是 6) -> `ign gazebo`
+- 執行大於 7 -> `gz sim`
+- 由於下載的是 binary 版本，ros_gz_bridge 等應該都只適配到 fortress?
