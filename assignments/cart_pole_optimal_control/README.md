@@ -13,6 +13,48 @@ The cart-pole system consists of:
 - Control input: Force applied to the cart
 - State vector: [x, ẋ, θ, θ̇] (cart position, cart velocity, pole angle, pole angular velocity)
 
+### Linearized Dynamics
+
+The linearized dynamics of the cart-pole system are represented by the state-space equations:
+
+\[
+\dot{x} = Ax + Bu
+\]
+
+where the state vector \( x \) is:
+
+\[
+x = \begin{bmatrix} x \\ \dot{x} \\ \theta \\ \dot{\theta} \end{bmatrix}
+\]
+
+The matrices \( A \) and \( B \) are defined as:
+
+\[
+A = \begin{bmatrix}
+0 & 1 & 0 & 0 \\
+0 & 0 & -\frac{m^2 g L^2}{p} & 0 \\
+0 & 0 & 0 & 1 \\
+0 & 0 & -\frac{m g L (M + m)}{p} & 0
+\end{bmatrix}
+\]
+
+\[
+B = \begin{bmatrix}
+0 \\
+\frac{I + m L^2}{p} \\
+0 \\
+\frac{m L}{p}
+\end{bmatrix}
+\]
+
+where:
+- \( M \) is the mass of the cart
+- \( m \) is the mass of the pole
+- \( L \) is the length of the pole
+- \( g \) is the acceleration due to gravity
+- \( I = \frac{m L^2}{3} \) is the moment of inertia of the pole
+- \( p = I (M + m) + M m L^2 \) is a derived parameter
+
 ## Prerequisites
 
 - ROS 2 Jazzy

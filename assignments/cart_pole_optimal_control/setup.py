@@ -13,7 +13,6 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'launch'), [
-            os.path.join('launch', 'cart_pole.launch.py'),
             os.path.join('launch', 'cart_pole_gazebo.launch.py'),
         ]),
         (os.path.join('share', package_name, 'models', 'cart_pole'),
